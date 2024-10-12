@@ -25,8 +25,8 @@ from kerykeion.kr_types import (
     Houses
 )
 from kerykeion.utilities import (
-    get_number_from_name, 
-    get_kerykeion_point_from_degree, 
+    get_number_from_name,
+    get_kerykeion_point_from_degree,
     get_planet_house,
     get_moon_emoji_from_phase_int,
     get_moon_phase_name_from_phase_int,
@@ -79,7 +79,7 @@ class AstrologicalSubject:
     - online (bool, optional): Sets if you want to use the online mode, which fetches the timezone and coordinates from geonames.
         If you already have the coordinates and timezone, set this to False. Defaults to True.
     - disable_chiron: Deprecated, use disable_chiron_and_lilith instead.
-    - sidereal_mode (SiderealMode, optional): Also known as Ayanamsa. 
+    - sidereal_mode (SiderealMode, optional): Also known as Ayanamsa.
         The mode to use for the sidereal zodiac, according to the Swiss Ephemeris.
         Defaults to "FAGAN_BRADLEY".
         Available modes are visible in the SiderealMode Literal.
@@ -197,10 +197,10 @@ class AstrologicalSubject:
                 "Please use 'disable_chiron' instead.",
                 DeprecationWarning
             )
-            
+
             if disable_chiron_and_lilith:
                 raise ValueError("Cannot specify both 'disable_chiron' and 'disable_chiron_and_lilith'. Use 'disable_chiron_and_lilith' only.")
-        
+
             self.disable_chiron_and_lilith = disable_chiron
         # <--- Deprecation warnings
 
@@ -251,7 +251,7 @@ class AstrologicalSubject:
             logging.info("No latitude specified, using London as default")
         else:
             self.lat = lat # type: ignore
- 
+
         # Longitude
         if not lng and not self.online:
             self.lng = 0
@@ -278,7 +278,7 @@ class AstrologicalSubject:
         # Chart Perspective check and setup --->
         if self.perspective_type not in get_args(PerspectiveType):
             raise KerykeionException(f"\n* ERROR: '{self.perspective_type}' is NOT a valid chart perspective! Available perspectives are: *" + "\n" + str(get_args(PerspectiveType)))
-        
+
         if self.perspective_type == "True Geocentric":
             self._iflag += swe.FLG_TRUEPOS
         elif self.perspective_type == "Heliocentric":
@@ -304,14 +304,14 @@ class AstrologicalSubject:
 
         if self.sidereal_mode and self.zodiac_type == "Tropic":
             raise KerykeionException("You can't set a sidereal mode with a Tropic zodiac type!")
-        
+
         if self.zodiac_type == "Sidereal" and not self.sidereal_mode:
             self.sidereal_mode = DEFAULT_SIDEREAL_MODE
             logging.info("No sidereal mode set, using default FAGAN_BRADLEY")
 
         if self.zodiac_type == "Sidereal":
             # Check if the sidereal mode is valid
-            
+
             if not self.sidereal_mode or not self.sidereal_mode in get_args(SiderealMode):
                 raise KerykeionException(f"\n* ERROR: '{self.sidereal_mode}' is NOT a valid sidereal mode! Available modes are: *" + "\n" + str(get_args(SiderealMode)))
 
@@ -328,7 +328,7 @@ class AstrologicalSubject:
         # UTC, julian day and local time setup --->
         if (self.online) and (not self.tz_str) and (not self.lat) and (not self.lng):
             self._fetch_and_set_tz_and_coordinates_from_geonames()
-        
+
         self.lat = check_and_adjust_polar_latitude(self.lat)
 
         # Local time to UTC
@@ -477,6 +477,17 @@ class AstrologicalSubject:
             self.eleventh_house,
             self.twelfth_house,
         ]
+
+    def _get_planetary_data(julian_day, planet_index, iflag):
+        data = swe.calc(julian_day, planet_index, iflag)[0]
+        return {
+            "longitude": data[0],
+            "latitude": data[1],
+            "distance": data[2],
+            "speed_longitude": data[3],
+            "speed_latitude": data[4],
+            "speed_distance": data[5]
+        }
 
     def _initialize_planets(self) -> None:
         """Defines body positon in signs and information and
@@ -651,7 +662,7 @@ class AstrologicalSubject:
         Returns the UTC time as a float.
         """
         dt = datetime.fromisoformat(self.iso_formatted_utc_datetime)
-        
+
         # Extract the hours, minutes, and seconds
         hours = dt.hour
         minutes = dt.minute
@@ -669,7 +680,7 @@ class AstrologicalSubject:
         Returns the local time as a float.
         """
         dt = datetime.fromisoformat(self.iso_formatted_local_datetime)
-        
+
         # Extract the hours, minutes, and seconds
         hours = dt.hour
         minutes = dt.minute
@@ -684,8 +695,8 @@ class AstrologicalSubject:
     @staticmethod
     def get_from_iso_utc_time(
         name: str,
-        iso_utc_time: str, 
-        city: str = "Greenwich", 
+        iso_utc_time: str,
+        city: str = "Greenwich",
         nation: str = "GB",
         tz_str: str = "Etc/GMT",
         online: bool = False,
@@ -697,7 +708,7 @@ class AstrologicalSubject:
         sidereal_mode: Union[SiderealMode, None] = None,
         houses_system_identifier: HousesSystemIdentifier = DEFAULT_HOUSES_SYSTEM_IDENTIFIER,
         perspective_type: PerspectiveType = DEFAULT_PERSPECTIVE_TYPE
-        
+
     ) -> "AstrologicalSubject":
         """
         Creates an AstrologicalSubject object from an iso formatted UTC time.
@@ -775,7 +786,7 @@ if __name__ == "__main__":
     from kerykeion.utilities import setup_logging
 
     setup_logging(level="debug")
-    
+
     # With Chiron enabled
     johnny = AstrologicalSubject("Johnny Depp", 1963, 6, 9, 0, 0, "Owensboro", "US")
     print(json.loads(johnny.json(dump=True)))
