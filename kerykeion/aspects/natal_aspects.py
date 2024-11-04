@@ -54,8 +54,18 @@ class NatalAspects:
         for first in range(len(active_points_list)):
             # Generates the aspects list without repetitions
             for second in range(first + 1, len(active_points_list)):
+                # South Node and North Node are always in opposition
+                nodes_pairs = {
+                    ("True_Node", "True_South_Node"),
+                    ("Mean_Node", "Mean_South_Node"),
+                    ("True_South_Node", "True_Node"),
+                    ("Mean_South_Node", "Mean_Node"),
+                }
+                if (active_points_list[first]["name"], active_points_list[second]["name"]) in nodes_pairs:
+                    continue
+
                 aspect = get_aspect_from_two_points(
-                    self.aspects_settings, active_points_list[first]["abs_pos"], 
+                    self.aspects_settings, active_points_list[first]["abs_pos"],
                     active_points_list[second]["abs_pos"]
                 )
 
@@ -132,12 +142,12 @@ if __name__ == "__main__":
 
     johnny = AstrologicalSubject("Johnny Depp", 1963, 6, 9, 0, 0, "Owensboro", "US")
 
-    # All aspects
+    # All aspects as a list of dictionaries
     aspects = NatalAspects(johnny)
-    print(aspects.all_aspects)
+    print([a.model_dump() for a in aspects.all_aspects])
 
     print("\n")
 
-    # Relevant aspects
+    # Relevant aspects as a list of dictionaries
     aspects = NatalAspects(johnny)
-    print(aspects.relevant_aspects)
+    print([a.model_dump() for a in aspects.relevant_aspects])

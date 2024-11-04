@@ -139,6 +139,8 @@ class AstrologicalSubject:
     mean_node: KerykeionPointModel
     chiron: Union[KerykeionPointModel, None]
     mean_lilith: Union[KerykeionPointModel, None]
+    true_south_node: KerykeionPointModel
+    mean_south_node: KerykeionPointModel
 
     # Houses
     first_house: KerykeionPointModel
@@ -507,6 +509,10 @@ class AstrologicalSubject:
         pluto_deg = swe.calc(self.julian_day, 9, self._iflag)[0][0]
         mean_node_deg = swe.calc(self.julian_day, 10, self._iflag)[0][0]
         true_node_deg = swe.calc(self.julian_day, 11, self._iflag)[0][0]
+        # For south nodes there exist no Swiss Ephemeris library calculation function,
+        # but they are simply opposite the north node.
+        mean_south_node_deg = (mean_node_deg + 180) % 360
+        true_south_node_deg = (true_node_deg + 180) % 360
 
         self.sun = get_kerykeion_point_from_degree(sun_deg, "Sun", point_type=point_type)
         self.moon = get_kerykeion_point_from_degree(moon_deg, "Moon", point_type=point_type)
@@ -520,6 +526,8 @@ class AstrologicalSubject:
         self.pluto = get_kerykeion_point_from_degree(pluto_deg, "Pluto", point_type=point_type)
         self.mean_node = get_kerykeion_point_from_degree(mean_node_deg, "Mean_Node", point_type=point_type)
         self.true_node = get_kerykeion_point_from_degree(true_node_deg, "True_Node", point_type=point_type)
+        self.mean_south_node = get_kerykeion_point_from_degree(mean_south_node_deg, "Mean_South_Node", point_type=point_type)
+        self.true_south_node = get_kerykeion_point_from_degree(true_south_node_deg, "True_South_Node", point_type=point_type)
 
         self.sun.house = get_planet_house(sun_deg, self._houses_degree_ut)
         self.moon.house = get_planet_house(moon_deg, self._houses_degree_ut)
@@ -533,6 +541,9 @@ class AstrologicalSubject:
         self.pluto.house = get_planet_house(pluto_deg, self._houses_degree_ut)
         self.mean_node.house = get_planet_house(mean_node_deg, self._houses_degree_ut)
         self.true_node.house = get_planet_house(true_node_deg, self._houses_degree_ut)
+        self.mean_south_node.house = get_planet_house(mean_south_node_deg, self._houses_degree_ut)
+        self.true_south_node.house = get_planet_house(true_south_node_deg, self._houses_degree_ut)
+
 
         # Deprecated
         planets_list = [
@@ -548,6 +559,8 @@ class AstrologicalSubject:
             self.pluto,
             self.mean_node,
             self.true_node,
+            self.mean_south_node,
+            self.true_south_node,
         ]
 
         if not self.disable_chiron_and_lilith:
@@ -574,6 +587,14 @@ class AstrologicalSubject:
         # Check in retrograde or not:
         for planet in planets_list:
             planet_number = get_number_from_name(planet["name"])
+
+            # Swiss ephemeris library does not offer calculation of direction of south nodes.
+            # But south nodes have same direction as north nodes. We can use those to calculate direction.
+            if planet_number == 1000:   # Number of Mean South Node
+                planet_number = 10      # Number of Mean North Node
+            elif planet_number == 1100: # Number of True South Node
+                planet_number = 11      # Number of True North Node
+
             if swe.calc(self.julian_day, planet_number, self._iflag)[0][3] < 0:
                 planet["retrograde"] = True
             else:

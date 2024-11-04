@@ -181,23 +181,25 @@ Returns:
 +----------+------+-------------+-----------+----------+
 | 8/6/1977 | 8:45 | Atlanta, US | -84.38798 | 33.749   |
 +----------+------+-------------+-----------+----------+
-+-----------+------+-------+------+----------------+
-| Planet    | Sign | Pos.  | Ret. | House          |
-+-----------+------+-------+------+----------------+
-| Sun       | Gem  | 17.6  | -    | Twelfth_House  |
-| Moon      | Pis  | 16.43 | -    | Ninth_House    |
-| Mercury   | Tau  | 26.29 | -    | Eleventh_House |
-| Venus     | Tau  | 2.03  | -    | Tenth_House    |
-| Mars      | Tau  | 1.79  | -    | Tenth_House    |
-| Jupiter   | Gem  | 14.61 | -    | Eleventh_House |
-| Saturn    | Leo  | 12.8  | -    | Second_House   |
-| Uranus    | Sco  | 8.27  | R    | Fourth_House   |
-| Neptune   | Sag  | 14.69 | R    | Fifth_House    |
-| Pluto     | Lib  | 11.45 | R    | Fourth_House   |
-| Mean_Node | Lib  | 21.49 | R    | Fourth_House   |
-| True_Node | Lib  | 22.82 | R    | Fourth_House   |
-| Chiron    | Tau  | 4.17  | -    | Tenth_House    |
-+-----------+------+-------+------+----------------+
++-----------------+------+-------+------+----------------+
+| Planet          | Sign | Pos.  | Ret. | House          |
++-----------------+------+-------+------+----------------+
+| Sun             | Gem  | 17.6  | -    | Twelfth_House  |
+| Moon            | Pis  | 16.43 | -    | Ninth_House    |
+| Mercury         | Tau  | 26.29 | -    | Eleventh_House |
+| Venus           | Tau  | 2.03  | -    | Tenth_House    |
+| Mars            | Tau  | 1.79  | -    | Tenth_House    |
+| Jupiter         | Gem  | 14.61 | -    | Eleventh_House |
+| Saturn          | Leo  | 12.8  | -    | Second_House   |
+| Uranus          | Sco  | 8.27  | R    | Fourth_House   |
+| Neptune         | Sag  | 14.69 | R    | Fifth_House    |
+| Pluto           | Lib  | 11.45 | R    | Fourth_House   |
+| Mean_Node       | Lib  | 21.49 | R    | Fourth_House   |
+| True_Node       | Lib  | 22.82 | R    | Fourth_House   |
+| Mean_South_Node | Ari  | 21.49 | R    | Tenth_House    |
+| True_South_Node | Ari  | 22.82 | R    | Tenth_House    |
+| Chiron          | Tau  | 4.17  | -    | Tenth_House    |
++-----------------+------+-------+------+----------------+
 +----------------+------+----------+
 | House          | Sign | Position |
 +----------------+------+----------+
@@ -327,6 +329,34 @@ from kerykeion.astrological_subject import AstrologicalSubject
 # Use the static method get_from_iso_utc_time to create an instance of AstrologicalSubject
 subject = AstrologicalSubject.get_from_iso_utc_time(
     "Johnny Depp", "1963-06-09T05:00:00Z", "Owensboro", "US", online=True)
+```
+
+## Lunar Nodes (Rahu & Ketu)
+
+The following are present:
+
+- True North Lunar Node: Simply referred to as "true_node" (without the term "north") for backward compatibility.
+- True South Lunar Node: Referred to as "true_south_node."
+- Mean North Lunar Node: Referred to as "mean_node" (without the term "north") for backward compatibility.
+- Mean South Lunar Node: Referred to as "mean_south_node."
+
+In instances of the AstrologicalSubject class, all of them are active by default.
+
+In instances of the classes used to generate aspects and SVG charts, only the mean nodes are active. To activate the true nodes, you need to edit the configuration file (kr.config.json).
+Example:
+
+```json
+...
+    {
+      "id": 19,
+      "name": "True_South_Node",
+      "color": "var(--kerykeion-chart-color-true-node)",
+      "is_active": true, // Set to true to activate the true node
+      "element_points": 0,
+      "related_zodiac_signs": [],
+      "label": "True_South_Node"
+    }
+...
 ```
 
 ## Documentation
