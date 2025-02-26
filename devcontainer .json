@@ -1,0 +1,16 @@
+{
+  "name": "Astro AI Dev Environment",
+  "image": "mcr.microsoft.com/devcontainers/python:3.10",
+  "features": {
+    "ghcr.io/devcontainers/features/flutter:1": {}
+  },
+  "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "dart-code.flutter",
+        "dart-code.dart"
+      ]
+    }
+  }
